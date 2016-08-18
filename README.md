@@ -22,10 +22,23 @@ npm install
 npm run build
 ```
 
+### Deploying code
+
+copy `config.example.js` to `config.js` and edit
+
+#### Run npm deploy script
+```
+npm run deploy
+```
+##### output:
+```
+[default] uploading code
+{"ok":1,"timestamp":1471549429480}
+```
+
 ### TODO:
 - clean up
 - fix logic (exercise for the reader?)
 - comment
-- add script for deploying to screeps using their api
 
 
