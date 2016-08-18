@@ -1,0 +1,15 @@
+## IntelliJ project files
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+## NODE Modules
+node_modules
+
+## Build Directory
+dist
+
+## Awesome Typescript Loader Cache
+.awcache

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "outFile": "./dist/main.js",
+    "module": "commonjs",
+    "target": "es6",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "preserveConstEnums": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "lib": ["dom","es5","es6","es7","es2017.object"],
+    "allowSyntheticDefaultImports": true,
+    "removeComments": false,
+    "noEmit": true
+  },
+  "include": [
+    "./typings/index.d.ts",
+    "./src/**/*.ts"
+  ],
+  "files": [
+    "./src/main.ts"
+  ],
+  "exclude": [
+    "./node_modules",
+    "./dist"
+  ],
+  "awesomeTypescriptLoaderOptions": {
+    "useBabel": true,
+    "forkChecker": true,
+    "useCache": false
+  }
+}

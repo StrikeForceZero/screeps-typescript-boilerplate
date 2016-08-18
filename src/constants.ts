@@ -1,0 +1,19 @@
+export const SPAWN_ERROR = {
+    [ERR_NOT_OWNER]: 'ERR_NOT_OWNER',
+    [ERR_NAME_EXISTS]: 'ERR_NAME_EXISTS',
+    [ERR_BUSY]: 'ERR_BUSY',
+    [ERR_NOT_ENOUGH_ENERGY] : 'ERR_NOT_ENOUGH_ENERGY',
+    [ERR_INVALID_ARGS] : 'ERR_INVALID_ARGS',
+    [ERR_RCL_NOT_ENOUGH] : 'ERR_RCL_NOT_ENOUGH'
+};
+
+export const BODY_COST = {
+    [MOVE]: 50,
+    [WORK]: 100,
+    [CARRY]: 50,
+    [ATTACK]: 80,
+    [RANGED_ATTACK]: 150,
+    [HEAL]: 250,
+    [CLAIM]: 600,
+    [TOUGH] : 10
+};
