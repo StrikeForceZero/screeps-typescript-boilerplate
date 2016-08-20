@@ -40,11 +40,8 @@ let spawnSequence = {
                         thisIsFirstMiner = false;
                         
                         console.log('current source:',assignedSource);
-                        if(assignedSource in assignedSources){
-                            assignedSources[assignedSource]++
-                        } else{
-                            assignedSources[assignedSource] = 1;
-                        }
+                        assignedSources[assignedSource] = assignedSources[assignedSource] || 0;
+                        assignedSources[assignedSource]++;
                     }
                 }
                 
