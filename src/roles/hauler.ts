@@ -9,21 +9,21 @@ let hauler = {
      */
     run: function(creep, creepTotals) {
         const minimumEnergyAmountToGrab = creep.carryCapacity;
-        const MaxRandomTargetsToPickFrom = 1
+        const MaxRandomTargetsToPickFrom = 1;
         
-        var target = Game.getObjectById(creep.memory.assignedDroppedEnergy)
+        let target = Game.getObjectById<Resource>(creep.memory.assignedDroppedEnergy);
         if(creep.carry.energy < creep.carryCapacity) {
             
             if(!target){
-                var targets = creep.room.find(FIND_DROPPED_ENERGY,{
+                const targets: Resource[] = creep.room.find(FIND_DROPPED_ENERGY,{ // TODO: figure out why it complains about creep.room.find<Resource>(...)
                     filter: (droppedEnergy) => droppedEnergy.amount > minimumEnergyAmountToGrab
                 });
-                var randomTargets = [];
+                const randomTargets: Resource[] = [];
                 for(var i=0; i < MaxRandomTargetsToPickFrom; i++){
                     var randomNumber = Math.floor((Math.random() * targets.length));
                     randomTargets.push(targets[randomNumber]);
                 }
-                var target = creep.pos.findClosestByRange(randomTargets);
+                target = creep.pos.findClosestByRange(randomTargets);
                 if(target){ creep.memory.assignedDroppedEnergy = target.id; }
             }
             
