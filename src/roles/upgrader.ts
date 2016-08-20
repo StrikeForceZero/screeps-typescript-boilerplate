@@ -1,8 +1,14 @@
-import { checkFullCargo, retrieveEnergy } from '../actions';
+import {
+    checkFullCargo as actionsCheckFullCargo,
+    retrieveEnergy as actionsRetrieveEnergy,
+} from '../actions';
 
 let upgrader = {
 
-    /** @param {Creep} creep **/
+    /**
+     * @param {Creep} creep
+     * @param creepTotals
+     */
     run: function(creep, creepTotals) {
         
         actionsCheckFullCargo.run(creep);

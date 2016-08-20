@@ -1,9 +1,12 @@
-import { dumpResources } from '../actions';
+import { dumpResources as actionsDumpResources } from '../actions';
 
 let hauler = {
-    
 
-    /** @param {Creep} creep **/
+
+    /**
+     * @param {Creep} creep
+     * @param creepTotals
+     */
     run: function(creep, creepTotals) {
         const minimumEnergyAmountToGrab = creep.carryCapacity;
         const MaxRandomTargetsToPickFrom = 1

@@ -3,7 +3,10 @@
 */
 let miner = {
 
-    /** @param {Creep} creep **/
+    /**
+     * @param {Creep} creep
+     * @param creepTotals
+     */
     run: function(creep, creepTotals) {
         
         // if(creep.carry.energy < creep.carryCapacity) {

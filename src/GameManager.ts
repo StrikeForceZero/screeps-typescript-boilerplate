@@ -1,8 +1,18 @@
 // import CreepWrapper from "./wrappers/CreepWrapper";
 // import {Role} from './wrappers/CreepWrapper';
 // import {SPAWN_ERROR} from './constants';
-import { retrieveTotals, spawnSequence } from './creepoverview';
-import { harvester, upgrader, builder, miner, hauler } from './roles';
+import {
+    retrieveTotals as creepsRetrieveTotals,
+    spawnSequence as creepsSpawnSequence,
+} from './creepoverview';
+
+import {
+    harvester as roleHarvester,
+    upgrader as roleUpgrader,
+    builder as roleBuilder,
+    miner as roleMiner,
+    hauler as roleHauler,
+} from './roles';
 
 export default class GameManager {
 
@@ -14,7 +24,7 @@ export default class GameManager {
                 upgraders: 0,
                 miners: 0,
                 haulers: 0,
-            }
+            };
             Memory.maxMinersPerSource = 3;
             Memory.MinimumEnergyToGrab = 50;
             Memory.gameTimeFromLastSpawnCheck = Game.time;
@@ -26,7 +36,7 @@ export default class GameManager {
             upgraders: 3,
             miners: 6,
             haulers: 10,
-        }
+        };
         const ticksToWaitBeforeSpawning = 5;
 
 
@@ -39,28 +49,28 @@ export default class GameManager {
     
 
 
-        let creepTotals = Memory.creepTotals
+        let creepTotals = Memory.creepTotals;
         
         if(!Game.spawns['Spawn1'].spawning && Game.time >= Memory.gameTimeFromLastSpawnCheck){
-            Memory.gameTimeFromLastSpawnCheck = Game.time + ticksToWaitBeforeSpawning
+            Memory.gameTimeFromLastSpawnCheck = Game.time + ticksToWaitBeforeSpawning;
             creepsSpawnSequence.run(creepMax)
-        };
+        }
         // console.log('creeper totals:',creepTotals.harvesters,creepTotals.builders,creepTotals.upgraders);
 
-        var tower = Game.getObjectById('TOWER_ID');
+        var tower = Game.getObjectById<Tower>('TOWER_ID');
         if(tower) {
-            var closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            var closestDamagedStructure = tower.pos.findClosestByRange<Structure>(FIND_STRUCTURES, {
                 filter: (structure) => structure.hits < structure.hitsMax
             });
             if(closestDamagedStructure) {
                 tower.repair(closestDamagedStructure);
             }
 
-            var closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+            var closestHostile = tower.pos.findClosestByRange<Creep>(FIND_HOSTILE_CREEPS);
             if(closestHostile) {
                 tower.attack(closestHostile);
             }
-        };
+        }
 
         for(var name in Game.creeps) {
             var creep = Game.creeps[name];

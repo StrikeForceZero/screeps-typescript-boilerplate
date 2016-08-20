@@ -1,4 +1,4 @@
-import { retrieveTotals } from '../creepoverview';
+import { retrieveTotals as creepsRetrieveTotals } from '../creepoverview';
 
 let spawnSequence = {
     
@@ -45,7 +45,7 @@ let spawnSequence = {
                         } else{
                             assignedSources[assignedSource] = 1;
                         }
-                    };
+                    }
                 }
                 
                 for (var assigned in assignedSources){
@@ -56,7 +56,7 @@ let spawnSequence = {
                     }
                 console.log('-- all sources:',assignedSources);
                 
-                var sources = creep.room.find(FIND_SOURCES);
+                var sources = creep.room.find<Source>(FIND_SOURCES);
                 var foundASource = false;
                 
                 for (var source in sources){
@@ -69,8 +69,8 @@ let spawnSequence = {
                         }
                     }
                     if(noSourcesMatch && !foundASource){
-                        console.log('WE FOUND OUR SOURCE!:',sources[source].id)
-                        thisMinersSource = sources[source].id
+                        console.log('WE FOUND OUR SOURCE!:',sources[source].id);
+                        thisMinersSource = sources[source].id;
                         foundASource = true;
                     }
                 }
@@ -78,7 +78,7 @@ let spawnSequence = {
                 
                 if (thisIsFirstMiner){
                     console.log('this is the first miner.');
-                    thisMinersSource = creep.pos.findClosestByPath(FIND_SOURCES).id;
+                    thisMinersSource = creep.pos.findClosestByPath<Source>(FIND_SOURCES).id;
                     console.log('his source:',thisMinersSource);
                 }
                 var newName = Game.spawns['Spawn1'].createCreep([WORK,WORK,MOVE], 'miner-'+ (Math.floor(Math.random() * 10000)+1), {role: 'miner', assignedSource: thisMinersSource});

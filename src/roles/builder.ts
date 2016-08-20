@@ -1,10 +1,16 @@
-import { dumpResources, checkFullCargo, retrieveEnergy } from '../actions';
+import {
+    dumpResources as actionsDumpResources,
+    checkFullCargo as actionsCheckFullCargo,
+    retrieveEnergy as actionsRetrieveEnergy,
+} from '../actions';
 
 let builder = {
-    
-    
-    
-    /** @param {Creep} creep **/
+
+
+    /**
+     * @param {Creep} creep
+     * @param creepTotals
+     */
     run: function(creep, creepTotals) {
 
         actionsCheckFullCargo.run(creep);
