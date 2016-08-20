@@ -1,4 +1,4 @@
-let creepsRetrieveTotals = {
+let retrieveTotals = {
 
     run:function(){
         Memory.creepTotals.harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester').length;
@@ -19,4 +19,4 @@ let creepsRetrieveTotals = {
 
 };
 
-export { creepsRetrieveTotals };
+export { retrieveTotals };
