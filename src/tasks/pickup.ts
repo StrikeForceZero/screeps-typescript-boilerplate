@@ -7,7 +7,7 @@ export default function runPickupTask(creep: CreepWrapper) {
     }
 
     const resources = creep.room.find<Resource>(FIND_DROPPED_RESOURCES);
-    if (resources.length && creep.pickup(resources[0]) === OK) {
+    if (resources.length > 0 && creep.pickup(resources[0]) === OK) {
         if (creep.isFull) {
             return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
         }
