@@ -10,15 +10,15 @@ module.exports = {
     target: 'node',
     context: __dirname,
     entry: {
-        main: "./src/main.ts"
+        main: "./src/main.ts",
     },
     output: {
         path: path.join(__dirname, "dist"),
         filename: "main.js",
         pathinfo: true,
         libraryTarget: "commonjs",
-        // name of the global var: "Foo"
-        library: "loop"
+        // name of the global var: "Foo",
+        library: "loop",
     },
     module: {
         loaders: [
@@ -28,21 +28,21 @@ module.exports = {
             {
                 test: /\.ts/,
                 include: path.join(__dirname, "src"),
-                loader: "tslint"
+                loader: "tslint",
             },
         ]
     },
     tslint: {
-        failOnHint: false
+        failOnHint: false,
     },
     resolve: {
         root: path.join(__dirname, "src"),
-        extensions: ['', '.ts']
+        extensions: ['', '.ts'],
     },
     plugins: [
         new ProgressBarPlugin({
             format: '  build [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds)',
-            clear: false
+            clear: false,
         }),
         new TsConfigPathsPlugin(),
         new ForkCheckerPlugin(),
@@ -50,8 +50,8 @@ module.exports = {
             'process.env': {
                 BROWSER: JSON.stringify(true),
                 NODE_ENV: JSON.stringify('development')
-            }
+            },
         }),
-        new webpack.NoErrorsPlugin()
+        new webpack.NoErrorsPlugin(),
     ],
 };

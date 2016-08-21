@@ -1,11 +1,10 @@
-import CreepWrapper from "./wrappers/CreepWrapper";
+import CreepWrapper from './wrappers/CreepWrapper';
 import {Role} from './wrappers/CreepWrapper';
 import {SPAWN_ERROR} from './constants';
 
-
 export default class GameManager {
 
-    static loop() {
+    public static loop() {
 
         const spawn = Game.spawns['Spawn1'];
 
@@ -22,7 +21,7 @@ export default class GameManager {
             creep.assignRole(Role.Harvester, true);
         }
 
-        for(const rawCreep of Object.values(Game.creeps)){
+        for (const rawCreep of Object.values(Game.creeps)) {
             const creep = new CreepWrapper(rawCreep);
 
             creep.run();

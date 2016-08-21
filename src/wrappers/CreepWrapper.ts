@@ -1,4 +1,4 @@
-import EntityWithNameAndId from "./EntityWithNameAndId";
+import EntityWithNameAndId from './EntityWithNameAndId';
 import runSourceTask from '../tasks/source';
 import runPickupTask from '../tasks/pickup';
 import runStoreTask from '../tasks/store';
@@ -53,7 +53,7 @@ export const RoleTasks = {
 export interface IWrapped {
     memory: {
         isWrapped: boolean,
-    }
+    };
 }
 
 export interface IHasRole {
@@ -65,107 +65,108 @@ export interface IHasRole {
         currentRoleTaskStatus: RoleTaskStatus,
         pos: RoomPosition,
         hasMoved: boolean
-    }
+    };
 }
 
 type CreepWrapperEntityType = Creep & IWrapped & IHasRole;
 
 export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntityType> {
-    constructor(creep: CreepWrapperEntityType | Creep){
+    constructor(creep: CreepWrapperEntityType | Creep) {
         super(CreepWrapper.wrap(creep));
     }
 
-    private static wrap(creep: Creep) : CreepWrapperEntityType{
+    private static wrap(creep: Creep): CreepWrapperEntityType {
         const wrappedCreep = creep as CreepWrapperEntityType;
 
         wrappedCreep.memory.hasMoved = false;
 
-        if(!_.isEqual(Object.assign({}, wrappedCreep.memory.pos), Object.assign({}, wrappedCreep.pos))) {
-            wrappedCreep.memory.pos = Object.assign({}, wrappedCreep.pos);
+        if (!_.isEqual(Object.assign({}, wrappedCreep.memory.pos), Object.assign({}, wrappedCreep.pos))) {
+            wrappedCreep.memory.pos      = Object.assign({}, wrappedCreep.pos);
             wrappedCreep.memory.hasMoved = true;
         }
 
-        if(wrappedCreep.memory.isWrapped)
+        if (wrappedCreep.memory.isWrapped) {
             return wrappedCreep;
+        }
 
         wrappedCreep.memory.isWrapped = true;
         return CreepWrapper.assignRole(wrappedCreep, wrappedCreep.memory.currentRole);
     }
 
-    get creep(){
+    get creep() {
         return this.target;
     }
 
-    get memory(){
+    get memory() {
         return this.target.memory;
     }
 
-    get room(){
+    get room() {
         return this.target.room;
     }
 
-    get isFull(){
-        return this.creep.carry.energy == this.creep.carryCapacity;
+    get isFull() {
+        return this.creep.carry.energy === this.creep.carryCapacity;
     }
 
-    get isEmpty(){
+    get isEmpty() {
         return this.creep.carry.energy === 0;
     }
 
-    static assignRole(creep: CreepWrapperEntityType, role: Role = Role.None, isDefault: boolean = false){
-        creep.memory.defaultRole = isDefault ? role : creep.memory.defaultRole || role;
-        creep.memory.currentRole = role;
-        creep.memory.currentRoleStatus = RoleTaskStatus.Ok;
-        creep.memory.currentRoleTask = RoleTaskPriorty[role][0];
+    public static assignRole(creep: CreepWrapperEntityType, role: Role = Role.None, isDefault: boolean = false) {
+        creep.memory.defaultRole           = isDefault ? role : creep.memory.defaultRole || role;
+        creep.memory.currentRole           = role;
+        creep.memory.currentRoleStatus     = RoleTaskStatus.Ok;
+        creep.memory.currentRoleTask       = RoleTaskPriorty[role][0];
         creep.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
         return creep;
     }
 
-    assignRole(role: Role, isDefault: boolean = false){
+    public assignRole(role: Role, isDefault: boolean = false) {
         return CreepWrapper.assignRole(this.target, role, isDefault);
     }
 
-    nextTask(){
-        const currentRoleTasks = RoleTaskPriorty[this.memory.currentRole],
-              currentRoleTaskIndex = currentRoleTasks.indexOf(this.memory.currentRoleTask),
-              nextRoleTaskIndex = currentRoleTaskIndex >= currentRoleTasks.length ? 0 : currentRoleTaskIndex + 1;
-        this.memory.currentRoleTask = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
+    public nextTask() {
+        const currentRoleTasks            = RoleTaskPriorty[this.memory.currentRole];
+        const currentRoleTaskIndex        = currentRoleTasks.indexOf(this.memory.currentRoleTask);
+        const nextRoleTaskIndex           = currentRoleTaskIndex >= currentRoleTasks.length ? 0 : currentRoleTaskIndex + 1;
+        this.memory.currentRoleTask       = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
         this.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
         console.log(`${this.name} role: ${Role[this.memory.currentRole]} next: ${RoleTask[RoleTaskPriorty[this.memory.currentRole].indexOf(this.memory.currentRoleTask)]}`);
         return this;
     }
 
-    prevTask(){
-        const currentRoleTasks = RoleTaskPriorty[this.memory.currentRole],
-              currentRoleTaskIndex = currentRoleTasks.indexOf(this.memory.currentRoleTask),
-              nextRoleTaskIndex = currentRoleTaskIndex > 0 ? currentRoleTaskIndex - 1 : 0;
-        this.memory.currentRoleTask = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
+    public prevTask() {
+        const currentRoleTasks            = RoleTaskPriorty[this.memory.currentRole];
+        const currentRoleTaskIndex        = currentRoleTasks.indexOf(this.memory.currentRoleTask);
+        const nextRoleTaskIndex           = currentRoleTaskIndex > 0 ? currentRoleTaskIndex - 1 : 0;
+        this.memory.currentRoleTask       = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
         this.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
         console.log(`${this.name} role: ${Role[this.memory.currentRole]} previous: ${RoleTask[currentRoleTasks[nextRoleTaskIndex]]}`);
         return this;
     }
 
-    nextRole(){
-        const roles = Object.entries(Role).slice(0, Object.keys(Role).length/2).map(([value, name]) => parseInt(value,10)),
-              currentRoleIndex = roles.findIndex(r => r === this.memory.currentRole),
-              nextRoleIndex = currentRoleIndex >= roles.length ? 0 : currentRoleIndex + 1;
+    public nextRole() {
+        const roles            = Object.entries(Role).slice(0, Object.keys(Role).length / 2).map(([value, name]) => parseInt(value, 10));
+        const currentRoleIndex = roles.findIndex(r => r === this.memory.currentRole);
+        const nextRoleIndex    = currentRoleIndex >= roles.length ? 0 : currentRoleIndex + 1;
         this.assignRole(Role[Role[roles[nextRoleIndex]]]);
         console.log(`${this.name} role: ${Role[this.memory.currentRole]} task: ${RoleTask[RoleTaskPriorty[this.memory.currentRole][0]]}`);
         return this;
     }
 
-    updateCurrentTaskStatus(status: RoleTaskStatus){
+    public updateCurrentTaskStatus(status: RoleTaskStatus) {
         this.memory.currentRoleTaskStatus = status;
     }
 
-    updateCurrentRoleStatus(status: RoleTaskStatus){
+    public updateCurrentRoleStatus(status: RoleTaskStatus) {
         this.memory.currentRoleStatus = status;
     }
 
-    harvest(source: Source){
+    public harvest(source: Source) {
         const harvestResult = this.creep.harvest(source);
-        if(harvestResult == ERR_NOT_IN_RANGE) {
-            if(!this.memory.hasMoved){
+        if (harvestResult === ERR_NOT_IN_RANGE) {
+            if (!this.memory.hasMoved) {
                 return ERR_NOT_IN_RANGE;
             }
             return this.creep.moveTo(source);
@@ -173,24 +174,24 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         return harvestResult;
     }
 
-    pickup(resource: Resource){
+    public pickup(resource: Resource) {
         const pickupResult = this.creep.pickup(resource);
-        if(pickupResult == ERR_NOT_IN_RANGE) {
+        if (pickupResult === ERR_NOT_IN_RANGE) {
             return this.creep.moveTo(resource);
         }
         return pickupResult;
     }
 
-    store(target: Structure){
+    public store(target: Structure) {
         const transferResult = this.creep.transfer(target, RESOURCE_ENERGY);
-        if(transferResult == ERR_NOT_IN_RANGE) {
+        if (transferResult === ERR_NOT_IN_RANGE) {
             return this.creep.moveTo(target);
         }
         return transferResult;
     }
 
-    private performTask(){
-        switch (this.memory.currentRoleTask){
+    private performTask() {
+        switch (this.memory.currentRoleTask) {
             case RoleTask.Source:
                 return runSourceTask(this);
             case RoleTask.Pickup:
@@ -201,14 +202,18 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                 return console.log(`${this.creep.name} is doing nothing!`);
             default:
                 console.log(`task: ${RoleTask[this.memory.currentRoleTask]} not implemented`);
-                //throw new Error('unknown task');
+            // throw new Error('unknown task');
         }
     }
 
-    private checkTaskStatus(){
+    private checkTaskStatus() {
 
-        console.log(`${this.name} role: ${Role[this.memory.currentRole]} task: ${RoleTask[RoleTaskPriorty[this.memory.currentRole][0]]} status: ${RoleTaskStatus[this.memory.currentRoleStatus]}`);
-        switch(this.memory.currentRoleStatus){
+        console.log(`${this.name} \
+                role: ${Role[this.memory.currentRole]} \ 
+                task: ${RoleTask[RoleTaskPriorty[this.memory.currentRole][0]]} \ 
+                status: ${RoleTaskStatus[this.memory.currentRoleStatus]} \
+        `);
+        switch (this.memory.currentRoleStatus) {
             case RoleTaskStatus.Failed:
                 // try the next role
                 this.nextRole();
@@ -225,8 +230,8 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         }
     }
 
-    private checkRoleStatus(){
-        switch(this.memory.currentRoleTaskStatus){
+    private checkRoleStatus() {
+        switch (this.memory.currentRoleTaskStatus) {
             case RoleTaskStatus.Failed:
                 this.nextTask();
                 break;
@@ -236,7 +241,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
             case RoleTaskStatus.Completed:
                 const role = this.memory.currentRole;
                 // if we are not at the top level role task
-                if(RoleTaskPriorty[role].indexOf(this.memory.currentRoleTask) > 0){
+                if (RoleTaskPriorty[role].indexOf(this.memory.currentRoleTask) > 0) {
                     this.prevTask();
                     break;
                 }
@@ -248,7 +253,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         }
     }
 
-    run(){
+    public run() {
         this.performTask();
 
         this.checkTaskStatus();

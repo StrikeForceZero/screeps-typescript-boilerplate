@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "description": "WIP boilerplate for screeps with typescript support",
   "scripts": {
-    "clean": "rimraf dist",
-    "prebuild": "npm run clean",
-    "build": "webpack --config webpack.config.js",
+    "build:clean": "rimraf dist",
+    "prebuild": "npm run build:clean",
+    "build": "webpack --config webpack.config.js --watch",
+    "start": "npm run build",
     "deploy": "node deploy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

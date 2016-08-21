@@ -1,6 +1,6 @@
 import GameManager from './GameManager';
 import 'polyfills';
 
-console.log('start');
+// console.log('start');
 
 module.exports = () => GameManager.loop();

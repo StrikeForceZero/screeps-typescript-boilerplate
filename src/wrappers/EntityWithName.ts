@@ -1,4 +1,4 @@
-import Manager from "./AbstractRoomObjectWrapper";
+import Manager from './AbstractRoomObjectWrapper';
 
 export interface IEntityWithName extends RoomObject {
     name: string;
