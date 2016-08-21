@@ -322,6 +322,12 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     this.assignRole(Role.Upgrader);
                     break;
                 }
+                // need maintainers?
+                if (this.creep.room.find<Structure>(FIND_STRUCTURES, { filter: structure => structure.hits < structure.hitsMax * .75 }).length > 0) {
+                    console.log('maintainers needed!');
+                    this.assignRole(Role.Maintainer);
+                    break;
+                }
                 // try the next role
                 this.nextRole();
                 break;
