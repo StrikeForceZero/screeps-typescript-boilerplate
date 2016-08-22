@@ -1,7 +1,6 @@
-import CreepWrapper, {CreepClass, CreepClasses} from './wrappers/CreepWrapper';
+import CreepWrapper, {CreepClass, CreepClassTypes, getCreepClass} from './wrappers/CreepWrapper';
 import {Role} from './wrappers/CreepWrapper';
 import {SPAWN_ERROR} from './constants';
-import {RoleTask} from './wrappers/CreepWrapper';
 
 type roleMap = { [key: string]: CreepWrapper[] };
 
@@ -51,17 +50,17 @@ export default class GameManager {
         let fightersNeeded = hostiles.length > 0 ? hostiles.length * 2 - creeps.filter(creep => creep.memory.currentRole === Role.Fighter).length : 0;
 
         if (fightersNeeded) {
-            if (createCreep(spawn, CreepClasses['FighterClass3']) === OK) {
+            if (createCreep(spawn, getCreepClass(CreepClassTypes.FighterClass3)) === OK) {
                 fightersNeeded--;
-            } else if (createCreep(spawn, CreepClasses['FighterClass2']) === OK) {
+            } else if (createCreep(spawn, getCreepClass(CreepClassTypes.FighterClass2)) === OK) {
                 //
-            } else if (createCreep(spawn, CreepClasses['FighterClass1']) === OK) {
+            } else if (createCreep(spawn, getCreepClass(CreepClassTypes.FighterClass1)) === OK) {
                 //
             }
         }
 
         if (!fightersNeeded && Memory.totalCreepsAlive < 15) {
-            createCreep(spawn, CreepClasses['WorkerClass1']);
+            createCreep(spawn, getCreepClass(CreepClassTypes.WorkerClass1));
         }
 
         const roles: roleMap = Object.keys(Role).slice(Object.keys(Role).length / 2).reduce((p, c) => {

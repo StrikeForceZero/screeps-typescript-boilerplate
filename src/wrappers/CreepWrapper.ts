@@ -70,14 +70,28 @@ export type Body =
 export type BodyConfig = Array<Body>;
 
 export type CreepClass = { body: BodyConfig, role: Role};
-export type CreepClassMap = { [key: string]: CreepClass };
 
-export const CreepClasses: CreepClassMap = {
+export interface ICreepClassMap {
+    [key: string]: CreepClass ;
+}
+
+export enum CreepClassTypes {
+    WorkerClass1,
+    FighterClass1,
+    FighterClass2,
+    FighterClass3,
+}
+
+export const CreepClassMap: ICreepClassMap = {
     WorkerClass1 : {body: [WORK, CARRY, MOVE], role: Role.Harvester},
     FighterClass1: {body: [ATTACK, MOVE], role: Role.Fighter},
     FighterClass2: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
     FighterClass3: {body: [TOUGH, ATTACK, MOVE, MOVE], role: Role.Fighter},
 };
+
+export function getCreepClass(classType: CreepClassTypes) {
+    return CreepClassMap[CreepClassTypes[classType]];
+}
 
 /*const convertBitArrayToFlags = (enumArray: RoleTask[]) => enumArray.reduce((flags, flag) => flags | flag, 0);
 
