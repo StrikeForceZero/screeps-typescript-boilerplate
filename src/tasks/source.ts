@@ -12,25 +12,25 @@ function checkHarvestResult(creep: CreepWrapper, targetSource: Source) {
         creep.memory.assignedSource = targetSource.id;
 
         if (creep.isFull) {
-            return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+            return RoleTaskStatus.Completed;
         }
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Ok);
+        return RoleTaskStatus.Ok;
     }
 
     console.log('failed secondary source');
 
     if (!creep.isEmpty) {
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+        return RoleTaskStatus.Completed;
     }
 
     creep.memory.assignedSource = undefined;
 
-    return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
+    return RoleTaskStatus.Failed;
 }
 
 export default function runSourceTask(creep: CreepWrapper) {
     if (creep.isFull) {
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+        return RoleTaskStatus.Completed;
     }
 
     const sources = creep.room.find<Source>(FIND_SOURCES);
@@ -40,7 +40,7 @@ export default function runSourceTask(creep: CreepWrapper) {
         creep.memory.assignedSource = creep.memory.assignedSource || sources[0].id;
 
         if (harvestResult === OK) {
-            return creep.updateCurrentTaskStatus(RoleTaskStatus.Ok);
+            return RoleTaskStatus.Ok;
         }
 
         if ([ERR_NOT_IN_RANGE, ERR_NO_PATH].includes(harvestResult) && sources.length > 1 && creep.memory.ticksSinceLastMove > 2) {
@@ -55,7 +55,7 @@ export default function runSourceTask(creep: CreepWrapper) {
 
     }
     if (!creep.isEmpty) {
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+        return RoleTaskStatus.Completed;
     }
-    return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
+    return RoleTaskStatus.Failed;
 };

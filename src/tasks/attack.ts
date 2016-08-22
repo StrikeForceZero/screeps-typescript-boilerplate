@@ -6,9 +6,9 @@ export default function runAttackTask(creep: CreepWrapper) {
 
     if (targets.length > 0 && creep.attack(targets[0]) === OK) {
         if (targets.length === 1 && targets[0].hits === 0) {
-            return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+            return RoleTaskStatus.Completed;
         }
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Ok);
+        return RoleTaskStatus.Ok;
     }
 
     const idleAreas = creep.room.find<Flag>(FIND_FLAGS, {
@@ -18,9 +18,9 @@ export default function runAttackTask(creep: CreepWrapper) {
     // goto to idle spot if not attackers so spawn doesn't get blocked
     if (targets.length === 0 && idleAreas.length > 0) {
         if (creep.creep.moveTo(idleAreas[0]) === OK) {
-            return creep.updateCurrentTaskStatus(RoleTaskStatus.Ok);
+            return RoleTaskStatus.Ok;
         }
     }
 
-    return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
+    return RoleTaskStatus.Failed;
 };

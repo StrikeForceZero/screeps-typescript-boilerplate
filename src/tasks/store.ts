@@ -3,7 +3,7 @@ import {RoleTaskStatus} from '../wrappers/CreepWrapper';
 
 export default function runStoreTask(creep: CreepWrapper) {
     if (creep.isEmpty) {
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
+        return RoleTaskStatus.Failed;
     }
 
     let targets = creep.room.find<Structure>(FIND_STRUCTURES, {
@@ -25,9 +25,9 @@ export default function runStoreTask(creep: CreepWrapper) {
 
     if (targets.length > 0 && creep.store(targets[0]) === OK) {
         if (creep.isEmpty) {
-            return creep.updateCurrentTaskStatus(RoleTaskStatus.Completed);
+            return RoleTaskStatus.Completed;
         }
-        return creep.updateCurrentTaskStatus(RoleTaskStatus.Ok);
+        return RoleTaskStatus.Ok;
     }
-    return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
+    return RoleTaskStatus.Failed;
 };
