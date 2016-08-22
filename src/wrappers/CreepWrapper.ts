@@ -285,13 +285,13 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         return harvestResult;
     }
 
-    public pickup(resource: Resource) {
-        const pickupResult = this.creep.pickup(resource);
+    public pickup(target: Resource | Creep) {
+        const pickupResult = target instanceof Resource ? this.creep.pickup(target) : this.creep.transfer(target, RESOURCE_ENERGY);
         if ([ERR_NOT_IN_RANGE, ERR_NO_PATH].includes(pickupResult)) {
             if (this.isStuck) {
                 return pickupResult;
             }
-            return this.creep.moveTo(resource);
+            return this.creep.moveTo(target);
         }
         return pickupResult;
     }

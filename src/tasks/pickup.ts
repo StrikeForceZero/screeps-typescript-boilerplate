@@ -1,13 +1,18 @@
 import CreepWrapper from '../wrappers/CreepWrapper';
 import {RoleTaskStatus} from '../wrappers/CreepWrapper';
+import {Role} from '../wrappers/CreepWrapper';
 
 export default function runPickupTask(creep: CreepWrapper) {
     if (creep.isFull) {
         return RoleTaskStatus.Completed;
     }
 
-    const resources = creep.room.find<Resource>(FIND_DROPPED_RESOURCES);
-    if (resources.length > 0 && creep.pickup(resources[0]) === OK) {
+    const carriersWithEnergy = creep.room.find<Creep>(FIND_MY_CREEPS, {filter: creep => creep.memory.currentRole === Role.Carrier && creep.carry.energy > 0});
+    const droppedResources = creep.room.find<Resource>(FIND_DROPPED_RESOURCES);
+
+    const targets = droppedResources.length > 0 ? droppedResources : carriersWithEnergy;
+
+    if (targets.length > 0 && creep.pickup(targets[0]) === OK) {
         if (creep.isFull) {
             return RoleTaskStatus.Completed;
         }
