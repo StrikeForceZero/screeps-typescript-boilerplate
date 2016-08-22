@@ -1,6 +1,24 @@
 import CreepWrapper from '../wrappers/CreepWrapper';
 import {RoleTaskStatus} from '../wrappers/CreepWrapper';
 
+enum BuildPriority {
+    road,
+    storage,
+    container,
+    extractor,
+    lab,
+    observer,
+    powerspawn, // TODO: one word?
+    nuker,
+    terminal,
+    extension,
+    wall,
+    rampart,
+    link,
+    tower,
+    spawn,
+}
+
 export default function runBuildTask(creep: CreepWrapper) {
     if (creep.isEmpty) {
         return RoleTaskStatus.Failed;
@@ -14,7 +32,19 @@ export default function runBuildTask(creep: CreepWrapper) {
         .map(flag => flag.pos.findInRange<ConstructionSite>(FIND_CONSTRUCTION_SITES, 2))
         .filter(x => x.length > 0);
 
-    const targets = priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES);
+    const targets = (priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES))
+        .sort((a, b) => {
+            const A = BuildPriority[a.structureType];
+            const B = BuildPriority[b.structureType];
+
+            if (_.isUndefined(A) && !_.isUndefined(B) || A < B) {
+                return 1;
+            }
+            if (!_.isUndefined(A) && _.isUndefined(B) || A > B) {
+                return -1;
+            }
+            return 0;
+        });
 
     if (targets.length > 0) {
         let currentIndex = 0;
