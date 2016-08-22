@@ -9,7 +9,7 @@ export default function runPickupTask(creep: CreepWrapper) {
 
     const carriersWithEnergy = creep.memory.currentRole !== Role.Carrier
         ? creep.room.find<Creep>(FIND_MY_CREEPS, {filter: creep => creep.memory.currentRole === Role.Carrier && creep.carry.energy > 0})
-        : [];
+        : creep.room.find<Creep>(FIND_MY_CREEPS, {filter: creep => creep.memory.currentRole === Role.Harvester && creep.carry.energy > 0});
     const droppedResources = creep.room.find<Resource>(FIND_DROPPED_RESOURCES);
 
     const targets = droppedResources.length > 0 ? droppedResources : carriersWithEnergy;
