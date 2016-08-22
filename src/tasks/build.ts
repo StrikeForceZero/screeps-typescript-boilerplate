@@ -32,8 +32,8 @@ export default function runBuildTask(creep: CreepWrapper) {
         .map(flag => flag.pos.findInRange<ConstructionSite>(FIND_CONSTRUCTION_SITES, 2))
         .filter(x => x.length > 0);
 
-    const targets = (priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES))
-        .sort((a, b) => {
+    let targets = (priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES));
+    targets.sort((a, b) => {
             const A = BuildPriority[a.structureType];
             const B = BuildPriority[b.structureType];
 

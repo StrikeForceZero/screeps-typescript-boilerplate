@@ -370,6 +370,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     ? this.updateCurrentTaskStatus(runStoreTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Build:
+                // console.log([this.hasBodyPart(WORK), this.hasBodyPart(CARRY), JSON.stringify(this.body)]);
                 return this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)
                     ? this.updateCurrentTaskStatus(runBuildTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
@@ -445,29 +446,36 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
     private checkRoleStatus() {
         switch (this.memory.currentRoleStatus) {
             case RoleTaskStatus.Failed:
-                console.log(`${this.name} dropping energy`);
-                this.creep.drop(RESOURCE_ENERGY, this.creep.carry.energy);
 
                 const takenRoles = Object.values(Game.creeps).map(creep => new CreepWrapper(creep).memory.currentRole);
                 // need harvesters?
-                if (!takenRoles.some(role => role === Role.Harvester)) {
+                if (!takenRoles.some(role => role === Role.Harvester) && this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)) {
                     console.log('harvesters needed!');
                     this.assignRole(Role.Harvester);
                     break;
                 }
                 // need upgraders?
-                if (this.creep.room.controller.ticksToDowngrade <= 500 && !takenRoles.some(role => role === Role.Upgrader)) {
+                if (this.creep.room.controller.ticksToDowngrade <= 500 && !takenRoles.some(role => role === Role.Upgrader) && this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)) {
                     console.log('upgraders needed!');
                     this.assignRole(Role.Upgrader);
                     break;
                 }
                 // need maintainers?
-                if (!takenRoles.some(role => role === Role.Maintainer)
-                    && this.creep.room.find<Structure>(FIND_STRUCTURES, {filter: structure => structure.hits < structure.hitsMax * .75}).length > 0) {
+                if (!takenRoles.some(role => role === Role.Maintainer && this.hasBodyPart(WORK) && this.hasBodyPart(CARRY))
+                    && this.creep.room.find<Structure>(FIND_STRUCTURES, {
+                        filter: structure =>
+                            structure.structureType !== 'constructedWall'
+                            && structure.structureType !== 'rampart'
+                            && structure.hits < structure.hitsMax * .75,
+                    }).length > 0) {
                     console.log('maintainers needed!');
                     this.assignRole(Role.Maintainer);
                     break;
                 }
+
+                console.log(`${this.name} dropping energy`);
+                this.creep.drop(RESOURCE_ENERGY, this.creep.carry.energy);
+
                 // try the next role
                 this.nextRole();
                 break;
