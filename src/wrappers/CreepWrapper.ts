@@ -6,6 +6,18 @@ import runStoreTask from '../tasks/store';
 import runBuildTask from '../tasks/build';
 import runUpgradeTask from '../tasks/upgrade';
 import runRepairTask from '../tasks/repair';
+import runAttackTask from '../tasks/attack';
+
+export enum BodyPart {
+    MOVE,
+    WORK,
+    CARRY,
+    ATTACK,
+    RANGED_ATTACK,
+    HEAL,
+    CLAIM,
+    TOUGH,
+}
 
 export enum RoleTaskStatus {
     Failed,
@@ -32,6 +44,7 @@ export enum Role {
     Builder    = 3,
     Upgrader   = 4,
     Maintainer = 5,
+    Fighter    = 6,
 }
 
 export const RoleTaskPriorty = {
@@ -41,18 +54,41 @@ export const RoleTaskPriorty = {
     [Role.Builder]   : [RoleTask.Build, RoleTask.Pickup, RoleTask.Source],
     [Role.Upgrader]  : [RoleTask.Upgrade, RoleTask.Pickup, RoleTask.Source],
     [Role.Maintainer]: [RoleTask.Repair, RoleTask.Pickup, RoleTask.Source],
+    [Role.Fighter]   : [RoleTask.Attack],
+};
+
+export type Body =
+    typeof MOVE
+        | typeof WORK
+        | typeof CARRY
+        | typeof ATTACK
+        | typeof RANGED_ATTACK
+        | typeof HEAL
+        | typeof CLAIM
+        | typeof TOUGH
+
+export type BodyConfig = Array<Body>;
+
+export type CreepClass = { body: BodyConfig, role: Role};
+export type CreepClassMap = { [key: string]: CreepClass };
+
+export const CreepClasses: CreepClassMap = {
+    WorkerClass1 : {body: [WORK, CARRY, MOVE], role: Role.Harvester},
+    FighterClass1: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
+    FighterClass2: {body: [ATTACK, MOVE], role: Role.Fighter},
+    FighterClass3: {body: [TOUGH, ATTACK, MOVE, MOVE], role: Role.Fighter},
 };
 
 /*const convertBitArrayToFlags = (enumArray: RoleTask[]) => enumArray.reduce((flags, flag) => flags | flag, 0);
 
-export const RoleTasks = {
-    [Role.None]      : convertBitArrayToFlags(RoleTaskPriorty[Role.None]),
-    [Role.Harvester] : convertBitArrayToFlags(RoleTaskPriorty[Role.Harvester]),
-    [Role.Carrier]   : convertBitArrayToFlags(RoleTaskPriorty[Role.Carrier]),
-    [Role.Builder]   : convertBitArrayToFlags(RoleTaskPriorty[Role.Builder]),
-    [Role.Upgrader]  : convertBitArrayToFlags(RoleTaskPriorty[Role.Upgrader]),
-    [Role.Maintainer]: convertBitArrayToFlags(RoleTaskPriorty[Role.Maintainer]),
-};*/
+ export const RoleTasks = {
+ [Role.None]      : convertBitArrayToFlags(RoleTaskPriorty[Role.None]),
+ [Role.Harvester] : convertBitArrayToFlags(RoleTaskPriorty[Role.Harvester]),
+ [Role.Carrier]   : convertBitArrayToFlags(RoleTaskPriorty[Role.Carrier]),
+ [Role.Builder]   : convertBitArrayToFlags(RoleTaskPriorty[Role.Builder]),
+ [Role.Upgrader]  : convertBitArrayToFlags(RoleTaskPriorty[Role.Upgrader]),
+ [Role.Maintainer]: convertBitArrayToFlags(RoleTaskPriorty[Role.Maintainer]),
+ };*/
 
 export interface IWrapped {
     memory: {
@@ -71,6 +107,7 @@ export interface IHasRole {
         lastTick: number,
         ticksSinceLastMove: number,
         assignedSource: string;
+        originalBodyConfig: BodyConfig;
     };
 }
 
@@ -88,7 +125,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
             return wrappedCreep;
         }
 
-        wrappedCreep.memory.lastTick = Game.time;
+        wrappedCreep.memory.lastTick           = Game.time;
         wrappedCreep.memory.ticksSinceLastMove = wrappedCreep.memory.ticksSinceLastMove || 0;
 
         const hasMoved = !_.isEqual(Object.assign({}, wrappedCreep.memory.pos), Object.assign({}, wrappedCreep.pos));
@@ -100,6 +137,8 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         if (wrappedCreep.memory.isWrapped) {
             return wrappedCreep;
         }
+
+        wrappedCreep.memory.originalBodyConfig = wrappedCreep.body.map(bpd => BodyPart[bpd.type.toUpperCase()]);
 
         wrappedCreep.memory.isWrapped = true;
         return CreepWrapper.assignRole(wrappedCreep, wrappedCreep.memory.currentRole);
@@ -115,6 +154,17 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
 
     get room() {
         return this.target.room;
+    }
+
+    get body() {
+        return this.creep.body;
+    }
+
+    public hasBodyPart(bodyPart: BodyPart | string) {
+        if (!isNaN(bodyPart as number)) {
+            bodyPart = BodyPart[bodyPart];
+        }
+        this.body.some(bpd => bpd.type.toUpperCase() === (bodyPart as string).toUpperCase());
     }
 
     get isFull() {
@@ -180,7 +230,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         this.memory.currentRoleStatus = status;
     }
 
-    public get isStuck(){
+    public get isStuck() {
         return this.memory.ticksSinceLastMove >= 7;
     }
 
@@ -250,6 +300,17 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         return repairResult;
     }
 
+    public attack(target: Creep) {
+        const attackResult = this.creep.attack(target);
+        if ([ERR_NOT_IN_RANGE, ERR_NO_PATH].includes(attackResult)) {
+            if (this.isStuck) {
+                return attackResult;
+            }
+            return this.creep.moveTo(target);
+        }
+        return attackResult;
+    }
+
     private performTask() {
         switch (this.memory.currentRoleTask) {
             case RoleTask.Source:
@@ -264,6 +325,8 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                 return runUpgradeTask(this);
             case RoleTask.Repair:
                 return runRepairTask(this);
+            case RoleTask.Attack:
+                return runAttackTask(this);
             case RoleTask.None:
                 this.updateCurrentTaskStatus(RoleTaskStatus.Failed);
                 this.updateCurrentRoleStatus(RoleTaskStatus.Failed);
@@ -277,10 +340,10 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
     private checkTaskStatus() {
 
         /*console.log(`${this.name} \n\
-                role: ${Role[this.memory.currentRole]} \
-                task: ${RoleTask[RoleTaskPriorty[this.memory.currentRole][0]]} \
-                status: ${RoleTaskStatus[this.memory.currentRoleStatus]} \
-        `);*/
+         role: ${Role[this.memory.currentRole]} \
+         task: ${RoleTask[RoleTaskPriorty[this.memory.currentRole][0]]} \
+         status: ${RoleTaskStatus[this.memory.currentRoleStatus]} \
+         `);*/
         switch (this.memory.currentRoleTaskStatus) {
             case RoleTaskStatus.Failed:
                 // try the next task
@@ -323,7 +386,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     break;
                 }
                 // need maintainers?
-                if (this.creep.room.find<Structure>(FIND_STRUCTURES, { filter: structure => structure.hits < structure.hitsMax * .75 }).length > 0) {
+                if (this.creep.room.find<Structure>(FIND_STRUCTURES, {filter: structure => structure.hits < structure.hitsMax * .75}).length > 0) {
                     console.log('maintainers needed!');
                     this.assignRole(Role.Maintainer);
                     break;

@@ -1,9 +1,30 @@
-import CreepWrapper from './wrappers/CreepWrapper';
+import CreepWrapper, {CreepClass, CreepClasses} from './wrappers/CreepWrapper';
 import {Role} from './wrappers/CreepWrapper';
 import {SPAWN_ERROR} from './constants';
 import {RoleTask} from './wrappers/CreepWrapper';
 
 type roleMap = { [key: string]: CreepWrapper[] };
+
+function createCreep(spawn: Spawn, creepClass: CreepClass) {
+    let creepResult: number | string = spawn.canCreateCreep(creepClass.body);
+    if (creepResult === OK) {
+        creepResult = spawn.createCreep(creepClass.body);
+        console.log(creepResult);
+
+        if (!isNaN(creepResult as number)) {
+            console.log(SPAWN_ERROR[creepResult]);
+            return creepResult;
+        }
+
+        Memory.totalCreepsAlive++;
+
+        const creep = new CreepWrapper(Game.creeps[creepResult]);
+        creep.assignRole(creepClass.role, true);
+
+        return creepResult;
+    }
+    return creepResult;
+}
 
 export default class GameManager {
 
@@ -11,19 +32,36 @@ export default class GameManager {
 
         console.log(`======= ${Game.time} =======`);
 
+        const creeps = Object.values(Game.creeps).map(creep => new CreepWrapper(creep));
+
+        Memory.totalCreepsAlive = Memory.totalCreepsAlive || creeps.length;
+
+        for (const name in Memory.creeps) {
+            if (!Game.creeps[name]) {
+                console.log('deleting old creep data');
+                Memory.totalCreepsAlive--;
+                delete Memory.creeps[name];
+            }
+        }
+
         const spawn = Game.spawns['Spawn1'];
 
-        if (spawn.canCreateCreep([WORK, CARRY, MOVE]) === OK) {
-            const creepResult = spawn.createCreep([WORK, CARRY, MOVE]);
-            console.log(creepResult);
+        const hostiles = spawn.room.find<Creep>(FIND_HOSTILE_CREEPS);
 
-            if (!isNaN(creepResult as number)) {
-                console.log(SPAWN_ERROR[creepResult]);
-                return;
+        let fightersNeeded = hostiles.length > 0 ? hostiles.length * 2 - creeps.filter(creep => creep.memory.currentRole === Role.Fighter).length : 0;
+
+        if (fightersNeeded) {
+            if (createCreep(spawn, CreepClasses['FighterClass3']) === OK) {
+                fightersNeeded--;
+            } else if (createCreep(spawn, CreepClasses['FighterClass2']) === OK) {
+                //
+            } else if (createCreep(spawn, CreepClasses['FighterClass1']) === OK) {
+                //
             }
+        }
 
-            const creep = new CreepWrapper(Game.creeps[creepResult]);
-            creep.assignRole(Role.Harvester, true);
+        if (!fightersNeeded && Memory.totalCreepsAlive < 15) {
+            createCreep(spawn, CreepClasses['WorkerClass1']);
         }
 
         const roles: roleMap = Object.keys(Role).slice(Object.keys(Role).length / 2).reduce((p, c) => {
@@ -31,8 +69,12 @@ export default class GameManager {
             return p;
         }, {});
 
-        for (const rawCreep of _.sortBy(Object.values(Game.creeps), 'name')) {
-            const creep = new CreepWrapper(rawCreep);
+        for (const creep of _.sortBy(creeps, 'name')) {
+
+            if (fightersNeeded > 0 && creep.hasBodyPart(ATTACK)) {
+                creep.assignRole(Role.Fighter);
+                fightersNeeded--;
+            }
 
             creep.run();
 
@@ -41,7 +83,7 @@ export default class GameManager {
 
         const outputTable = ['<table>'];
         for (const [role, creeps] of Object.entries(roles)) {
-            outputTable.push(`<tr><td>${role}</td>${creeps.map( creep => `<td>${creep.name}</td>`).join('')}</tr>`);
+            outputTable.push(`<tr><td>${role}</td>${creeps.map(creep => `<td>${creep.name}</td>`).join('')}</tr>`);
         }
         outputTable.push('</table>');
 
