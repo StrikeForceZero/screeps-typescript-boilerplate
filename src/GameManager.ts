@@ -76,7 +76,20 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
         return;
     }
 
-    Memory.spawnQueue.unshift(new SpawnQueueItem(CreepClassTypes.WorkerClass1, Role.Harvester));
+    if (Memory.spawnQueue.filter(x => x.classType === CreepClassTypes.WorkerClass1).length === 0) {
+        Memory.spawnQueue.unshift(new SpawnQueueItem(CreepClassTypes.WorkerClass1, Role.Harvester));
+    }
+
+    if (creepsWithStandardWorkerBodies.length < 4 &&
+        ((Memory.spawnQueue.length > 0 && Memory.spawnQueue[0].classType !== CreepClassTypes.WorkerClass1) || Memory.spawnQueue.length === 0)
+    ) {
+        let index = Memory.spawnQueue.findIndex(x => x.classType !== CreepClassTypes.WorkerClass1);
+        while (index > -1) {
+            Memory.spawnQueue.splice(index, 1);
+            index = Memory.spawnQueue.findIndex(x => x.classType !== CreepClassTypes.WorkerClass1);
+        }
+        Memory.spawnQueue.unshift(new SpawnQueueItem(CreepClassTypes.WorkerClass1, Role.Harvester));
+    }
 }
 
 export default class GameManager {
