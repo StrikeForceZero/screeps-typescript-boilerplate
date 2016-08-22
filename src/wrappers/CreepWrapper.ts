@@ -370,15 +370,15 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     ? this.updateCurrentTaskStatus(runStoreTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Build:
-                return this.hasBodyPart(WORK)
+                return this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)
                     ? this.updateCurrentTaskStatus(runBuildTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Upgrade:
-                return this.hasBodyPart(WORK)
+                return this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)
                     ? this.updateCurrentTaskStatus(runUpgradeTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Repair:
-                const result = this.hasBodyPart(WORK)
+                const result = this.hasBodyPart(WORK) && this.hasBodyPart(CARRY)
                     ? this.updateCurrentTaskStatus(runRepairTask(this))
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
                 if (result === RoleTaskStatus.Failed && this.isFull) {
