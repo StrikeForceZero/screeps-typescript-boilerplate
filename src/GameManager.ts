@@ -54,23 +54,32 @@ function processWorkerCreationQueue(spawn: Spawn) {
 }
 
 function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
-    const creepsWithStandardWorkerBodies = creeps.filter(creep => creep.bodyFlags & BodyPart.WORK & BodyPart.CARRY & BodyPart.MOVE);
+    const standardWorkerBody = (BodyPart.WORK | BodyPart.CARRY | BodyPart.MOVE);
+    const creepsWithStandardWorkerBodies = creeps.filter(creep => (creep.bodyFlags & standardWorkerBody) === standardWorkerBody);
+
+    console.log(creeps[0].bodyFlags.toString(2));
+    console.log(creepsWithStandardWorkerBodies.length);
 
     if (creepsWithStandardWorkerBodies.length > 4) {
-        const creepsWithCarrierBodies = creeps.filter(creep => creep.bodyFlags & BodyPart.CARRY & BodyPart.MOVE & ~BodyPart.WORK);
+        const carrierWorkerBody = (BodyPart.CARRY | BodyPart.MOVE);
+        const creepsWithCarrierBodies = creeps.filter(creep =>
+            // doesn't have WORK body
+            ((creep.bodyFlags & carrierWorkerBody) === carrierWorkerBody) && ((creep.bodyFlags & BodyPart.WORK) === 0) );
         if (creepsWithCarrierBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Carrier).length < 2) {
             Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.CarrierClass2, Role.Carrier, [ new SpawnQueueItem(CreepClassTypes.CarrierClass1, Role.Carrier)]));
         }
 
-        const creepsWithStationaryHarvesterBodies = creeps.filter(creep => creep.bodyFlags & BodyPart.WORK & BodyPart.MOVE & ~BodyPart.CARRY);
+        const stationaryHarvesterBody = (BodyPart.WORK | BodyPart.MOVE);
+        const creepsWithStationaryHarvesterBodies = creeps.filter(creep =>
+            // doesn't have CARRY body
+            ((creep.bodyFlags & stationaryHarvesterBody) === stationaryHarvesterBody) && ((creep.bodyFlags & BodyPart.CARRY) === 0));
         if (creepsWithStationaryHarvesterBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Harvester).length < 2) {
             Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.HarvesterClass2, Role.Harvester, [ new SpawnQueueItem(CreepClassTypes.HarvesterClass1, Role.Harvester)]));
         }
+        return;
     }
 
-    if (creeps.length < 5) {
-        Memory.spawnQueue.unshift(new SpawnQueueItem(CreepClassTypes.WorkerClass1, Role.Harvester));
-    }
+    Memory.spawnQueue.unshift(new SpawnQueueItem(CreepClassTypes.WorkerClass1, Role.Harvester));
 }
 
 export default class GameManager {
