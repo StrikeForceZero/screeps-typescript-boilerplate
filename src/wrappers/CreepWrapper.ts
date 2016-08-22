@@ -74,8 +74,8 @@ export type CreepClassMap = { [key: string]: CreepClass };
 
 export const CreepClasses: CreepClassMap = {
     WorkerClass1 : {body: [WORK, CARRY, MOVE], role: Role.Harvester},
-    FighterClass1: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
-    FighterClass2: {body: [ATTACK, MOVE], role: Role.Fighter},
+    FighterClass1: {body: [ATTACK, MOVE], role: Role.Fighter},
+    FighterClass2: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
     FighterClass3: {body: [TOUGH, ATTACK, MOVE, MOVE], role: Role.Fighter},
 };
 
