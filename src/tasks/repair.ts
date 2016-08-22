@@ -11,7 +11,15 @@ export default function runRepairTask(creep: CreepWrapper) {
     });
 
     const priorityTargets = priorityBuildAreas
-        .map(flag => flag.pos.findInRange<Structure>(FIND_STRUCTURES, 2, {filter: structure => structure.hits < structure.hitsMax}))
+        .map(flag => flag.pos.findInRange<Structure>(
+            FIND_STRUCTURES,
+            2,
+            {
+                filter: structure =>
+                    structure.structureType !== 'constructedWall'
+                    && structure.hits < structure.hitsMax
+                    || structure.structureType === 'constructedWall' && structure.hits < 10000,
+            }))
         .filter(x => x.length > 0);
 
     const targets = priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<Structure>(FIND_STRUCTURES, {
