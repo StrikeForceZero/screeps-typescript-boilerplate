@@ -16,15 +16,15 @@ export default function runRepairTask(creep: CreepWrapper) {
             2,
             {
                 filter: structure =>
-                    structure.structureType !== 'constructedWall' && structure.hits < structure.hitsMax
-                    || structure.structureType === 'constructedWall' && structure.hits < 10000,
+                    structure.structureType !== 'constructedWall' && structure.structureType !== 'rampart' && structure.hits < structure.hitsMax
+                    || (structure.structureType === 'constructedWall' || structure.structureType === 'rampart') && structure.hits < 10000,
             }))
         .filter(x => x.length > 0);
 
     const targets = priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<Structure>(FIND_STRUCTURES, {
         filter: (structure) =>
-            structure.structureType !== 'constructedWall' && structure.hits < structure.hitsMax
-            || structure.structureType === 'constructedWall' && structure.hits < 5000,
+        structure.structureType !== 'constructedWall' && structure.structureType !== 'rampart' && structure.hits < structure.hitsMax
+            || (structure.structureType === 'constructedWall' || structure.structureType === 'rampart') && structure.hits < 5000,
     });
 
     if (targets.length > 0) {
