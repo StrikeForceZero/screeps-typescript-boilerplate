@@ -58,20 +58,20 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
     const creepsWithStandardWorkerBodies = creeps.filter(creep => (creep.bodyFlags & standardWorkerBody) === standardWorkerBody);
 
     if (creepsWithStandardWorkerBodies.length > 4) {
-        const carrierWorkerBody = (BodyPart.CARRY | BodyPart.MOVE);
-        const creepsWithCarrierBodies = creeps.filter(creep =>
-            // doesn't have WORK body
-            ((creep.bodyFlags & carrierWorkerBody) === carrierWorkerBody) && ((creep.bodyFlags & BodyPart.WORK) === 0) );
-        if (creepsWithCarrierBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Carrier).length < 2) {
-            Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.CarrierClass2, Role.Carrier, [ new SpawnQueueItem(CreepClassTypes.CarrierClass1, Role.Carrier)]));
-        }
-
         const stationaryHarvesterBody = (BodyPart.WORK | BodyPart.MOVE);
         const creepsWithStationaryHarvesterBodies = creeps.filter(creep =>
             // doesn't have CARRY body
             ((creep.bodyFlags & stationaryHarvesterBody) === stationaryHarvesterBody) && ((creep.bodyFlags & BodyPart.CARRY) === 0));
         if (creepsWithStationaryHarvesterBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Harvester).length < 2) {
             Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.HarvesterClass2, Role.Harvester, [ new SpawnQueueItem(CreepClassTypes.HarvesterClass1, Role.Harvester)]));
+        }
+
+        const carrierWorkerBody = (BodyPart.CARRY | BodyPart.MOVE);
+        const creepsWithCarrierBodies = creeps.filter(creep =>
+            // doesn't have WORK body
+        ((creep.bodyFlags & carrierWorkerBody) === carrierWorkerBody) && ((creep.bodyFlags & BodyPart.WORK) === 0) );
+        if (creepsWithCarrierBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Carrier).length < 2) {
+            Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.CarrierClass2, Role.Carrier, [ new SpawnQueueItem(CreepClassTypes.CarrierClass1, Role.Carrier)]));
         }
         return;
     }
