@@ -8,15 +8,29 @@ import runUpgradeTask from '../tasks/upgrade';
 import runRepairTask from '../tasks/repair';
 import runAttackTask from '../tasks/attack';
 
+export enum CreepClassTypes {
+    WorkerClass1,
+
+    HarvesterClass1,
+    HarvesterClass2,
+
+    CarrierClass1,
+    CarrierClass2,
+
+    FighterClass1,
+    FighterClass2,
+    FighterClass3,
+}
+
 export enum BodyPart {
-    MOVE,
-    WORK,
-    CARRY,
-    ATTACK,
-    RANGED_ATTACK,
-    HEAL,
-    CLAIM,
-    TOUGH,
+    MOVE          = 1 << 0,
+    WORK          = 1 << 1,
+    CARRY         = 1 << 2,
+    ATTACK        = 1 << 3,
+    RANGED_ATTACK = 1 << 4,
+    HEAL          = 1 << 5,
+    CLAIM         = 1 << 6,
+    TOUGH         = 1 << 7,
 }
 
 export enum RoleTaskStatus {
@@ -75,15 +89,15 @@ export interface ICreepClassMap {
     [key: string]: CreepClass ;
 }
 
-export enum CreepClassTypes {
-    WorkerClass1,
-    FighterClass1,
-    FighterClass2,
-    FighterClass3,
-}
-
 export const CreepClassMap: ICreepClassMap = {
     WorkerClass1 : {body: [WORK, CARRY, MOVE], role: Role.Harvester},
+
+    HarvesterClass1 : {body: [WORK, MOVE], role: Role.Harvester},
+    HarvesterClass2 : {body: [WORK, WORK, MOVE], role: Role.Harvester},
+
+    CarrierClass1 : {body: [CARRY, MOVE], role: Role.Carrier},
+    CarrierClass2 : {body: [CARRY, CARRY, MOVE], role: Role.Carrier},
+
     FighterClass1: {body: [ATTACK, MOVE], role: Role.Fighter},
     FighterClass2: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
     FighterClass3: {body: [TOUGH, ATTACK, MOVE, MOVE], role: Role.Fighter},
@@ -152,7 +166,10 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
             return wrappedCreep;
         }
 
-        wrappedCreep.memory.originalBodyConfig = wrappedCreep.body.map(bpd => BodyPart[bpd.type.toUpperCase()]);
+        wrappedCreep.memory.originalBodyConfig = wrappedCreep.body.map(bpd => BodyPart[bpd.type.toUpperCase()]).reduce((p, c) => {
+            p |= c;
+            return p;
+        }, 0);
 
         wrappedCreep.memory.isWrapped = true;
         return CreepWrapper.assignRole(wrappedCreep, wrappedCreep.memory.currentRole);
@@ -172,6 +189,13 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
 
     get body() {
         return this.creep.body;
+    }
+
+    get bodyFlags() {
+        return this.body.map(bpd => BodyPart[bpd.type.toUpperCase()]).reduce((p, c) => {
+            p |= c;
+            return p;
+        }, 0);
     }
 
     public hasBodyPart(bodyPart: BodyPart | string) {
