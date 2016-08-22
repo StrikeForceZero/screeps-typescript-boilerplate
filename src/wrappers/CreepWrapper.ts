@@ -90,13 +90,13 @@ export interface ICreepClassMap {
 }
 
 export const CreepClassMap: ICreepClassMap = {
-    WorkerClass1 : {body: [WORK, CARRY, MOVE], role: Role.Harvester},
+    WorkerClass1: {body: [WORK, CARRY, MOVE], role: Role.Harvester},
 
-    HarvesterClass1 : {body: [WORK, MOVE], role: Role.Harvester},
-    HarvesterClass2 : {body: [WORK, WORK, MOVE], role: Role.Harvester},
+    HarvesterClass1: {body: [WORK, MOVE], role: Role.Harvester},
+    HarvesterClass2: {body: [WORK, WORK, MOVE], role: Role.Harvester},
 
-    CarrierClass1 : {body: [CARRY, MOVE], role: Role.Carrier},
-    CarrierClass2 : {body: [CARRY, CARRY, MOVE], role: Role.Carrier},
+    CarrierClass1: {body: [CARRY, MOVE], role: Role.Carrier},
+    CarrierClass2: {body: [CARRY, CARRY, MOVE], role: Role.Carrier},
 
     FighterClass1: {body: [ATTACK, MOVE], role: Role.Fighter},
     FighterClass2: {body: [ATTACK, MOVE, MOVE], role: Role.Fighter},
@@ -136,6 +136,7 @@ export interface IHasRole {
         ticksSinceLastMove: number,
         assignedSource: string;
         originalBodyConfig: BodyConfig;
+        isRoleLocked: boolean;
     };
 }
 
@@ -213,17 +214,18 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
         return this.creep.carry.energy <= 0;
     }
 
-    public static assignRole(creep: CreepWrapperEntityType, role: Role = Role.None, isDefault: boolean = false) {
+    public static assignRole(creep: CreepWrapperEntityType, role: Role = Role.None, isDefault: boolean = false, isRoleLocked: boolean = false) {
         creep.memory.defaultRole           = isDefault ? role : creep.memory.defaultRole || role;
         creep.memory.currentRole           = role;
         creep.memory.currentRoleStatus     = RoleTaskStatus.Ok;
         creep.memory.currentRoleTask       = RoleTaskPriorty[role][0];
         creep.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
+        creep.memory.isRoleLocked          = isRoleLocked;
         return creep;
     }
 
-    public assignRole(role: Role, isDefault: boolean = false) {
-        return CreepWrapper.assignRole(this.target, role, isDefault);
+    public assignRole(role: Role, isDefault: boolean = false, isRoleLocked: boolean = false) {
+        return CreepWrapper.assignRole(this.target, role, isDefault, isRoleLocked);
     }
 
     public nextTask() {
@@ -383,7 +385,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     ? this.updateCurrentTaskStatus(runRepairTask(this))
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
                 if (result === RoleTaskStatus.Failed && this.isFull) {
-                   this.updateCurrentRoleStatus(RoleTaskStatus.Failed);
+                    this.updateCurrentRoleStatus(RoleTaskStatus.Failed);
                 }
                 return result;
             case RoleTask.Attack:
@@ -446,6 +448,10 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
     private checkRoleStatus() {
         switch (this.memory.currentRoleStatus) {
             case RoleTaskStatus.Failed:
+                if (this.memory.isRoleLocked) {
+                    this.assignRole(this.memory.defaultRole, true, true);
+                    break;
+                }
 
                 const takenRoles = Object.values(Game.creeps).map(creep => new CreepWrapper(creep).memory.currentRole);
                 // need harvesters?
@@ -464,9 +470,9 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                 if (!takenRoles.some(role => role === Role.Maintainer && this.hasBodyPart(WORK) && this.hasBodyPart(CARRY))
                     && this.creep.room.find<Structure>(FIND_STRUCTURES, {
                         filter: structure =>
-                            structure.structureType !== 'constructedWall'
-                            && structure.structureType !== 'rampart'
-                            && structure.hits < structure.hitsMax * .75,
+                        structure.structureType !== 'constructedWall'
+                        && structure.structureType !== 'rampart'
+                        && structure.hits < structure.hitsMax * .75,
                     }).length > 0) {
                     console.log('maintainers needed!');
                     this.assignRole(Role.Maintainer);

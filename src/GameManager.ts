@@ -8,11 +8,12 @@ class SpawnQueueItem implements ISpawnQueueItem {
     constructor(
         public classType: CreepClassTypes | number,
         public defaultRole: Role | number,
+        public isRoleLocked = false,
         public fallBack: ISpawnQueueItem[] = [],
     ) { }
 }
 
-function createCreep(spawn: Spawn, creepClass: CreepClass) {
+function createCreep(spawn: Spawn, creepClass: CreepClass, isRoleLocked = false) {
     let creepResult: number | string = spawn.canCreateCreep(creepClass.body);
     if (creepResult === OK) {
         creepResult = spawn.createCreep(creepClass.body);
@@ -26,7 +27,7 @@ function createCreep(spawn: Spawn, creepClass: CreepClass) {
         Memory.totalCreepsAlive++;
 
         const creep = new CreepWrapper(Game.creeps[creepResult]);
-        creep.assignRole(creepClass.role, true);
+        creep.assignRole(creepClass.role, true, isRoleLocked);
 
         return creepResult;
     }
@@ -39,7 +40,7 @@ function processWorkerCreationQueue(spawn: Spawn) {
         return;
     }
     const spawnQueueItem = spawnQueue[0];
-    let result = createCreep(spawn, getCreepClass(spawnQueueItem.classType));
+    let result = createCreep(spawn, getCreepClass(spawnQueueItem.classType), spawnQueueItem.isRoleLocked);
     if (result === OK) {
         Memory.spawnQueue.splice(0, 1);
         return result;
@@ -65,7 +66,8 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
         if (creepsWithStationaryHarvesterBodies.length < 2
             && Memory.spawnQueue.filter(x => [CreepClassTypes.HarvesterClass2, CreepClassTypes.HarvesterClass1].includes(x.classType)).length < 2
         ) {
-            Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.HarvesterClass2, Role.Harvester, [ new SpawnQueueItem(CreepClassTypes.HarvesterClass1, Role.Harvester)]));
+            Memory.spawnQueue.push(
+                new SpawnQueueItem(CreepClassTypes.HarvesterClass2, Role.Harvester, true, [ new SpawnQueueItem(CreepClassTypes.HarvesterClass1, Role.Harvester)]));
         }
 
         const carrierWorkerBody = (BodyPart.CARRY | BodyPart.MOVE);
@@ -73,7 +75,7 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
             // doesn't have WORK body
         ((creep.bodyFlags & carrierWorkerBody) === carrierWorkerBody) && ((creep.bodyFlags & BodyPart.WORK) === 0) );
         if (creepsWithCarrierBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Carrier).length < 2) {
-            Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.CarrierClass2, Role.Carrier, [ new SpawnQueueItem(CreepClassTypes.CarrierClass1, Role.Carrier)]));
+            Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.CarrierClass2, Role.Carrier, true, [ new SpawnQueueItem(CreepClassTypes.CarrierClass1, Role.Carrier)]));
         }
         return;
     }
