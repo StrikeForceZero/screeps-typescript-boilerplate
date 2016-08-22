@@ -41,13 +41,13 @@ function processWorkerCreationQueue(spawn: Spawn) {
     const spawnQueueItem = spawnQueue[0];
     let result = createCreep(spawn, getCreepClass(spawnQueueItem.classType));
     if (result === OK) {
-        Memory.spawnQueue.shift();
+        Memory.spawnQueue.splice(0, 1);
         return result;
     }
     for (const queueItem of spawnQueueItem.fallBack) {
         result = createCreep(spawn, getCreepClass(queueItem.classType));
         if (result === OK) {
-            Memory.spawnQueue.shift();
+            Memory.spawnQueue.splice(0, 1);
             return result;
         }
     }
@@ -62,7 +62,9 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
         const creepsWithStationaryHarvesterBodies = creeps.filter(creep =>
             // doesn't have CARRY body
             ((creep.bodyFlags & stationaryHarvesterBody) === stationaryHarvesterBody) && ((creep.bodyFlags & BodyPart.CARRY) === 0));
-        if (creepsWithStationaryHarvesterBodies.length < 2 && Memory.spawnQueue.filter(x => x.defaultRole === Role.Harvester).length < 2) {
+        if (creepsWithStationaryHarvesterBodies.length < 2
+            && Memory.spawnQueue.filter(x => [CreepClassTypes.HarvesterClass2, CreepClassTypes.HarvesterClass1].includes(x.classType)).length < 2
+        ) {
             Memory.spawnQueue.push(new SpawnQueueItem(CreepClassTypes.HarvesterClass2, Role.Harvester, [ new SpawnQueueItem(CreepClassTypes.HarvesterClass1, Role.Harvester)]));
         }
 
