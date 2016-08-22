@@ -22,7 +22,7 @@ export default function runRepairTask(creep: CreepWrapper) {
         let currentIndex = 0;
         let result       = creep.repair(targets[currentIndex]);
 
-        while (currentIndex < targets.length && [ERR_NO_PATH, ERR_INVALID_TARGET].includes(result)) {
+        while (currentIndex < targets.length - 1 && [ERR_NO_PATH, ERR_INVALID_TARGET].includes(result)) {
             result = creep.repair(targets[++currentIndex]);
         }
 

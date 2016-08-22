@@ -20,7 +20,7 @@ export default function runBuildTask(creep: CreepWrapper) {
         let currentIndex = 0;
         let result       = creep.build(targets[currentIndex]);
 
-        while (currentIndex < targets.length && [ERR_NO_PATH, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH].includes(result)) {
+        while (currentIndex < targets.length - 1 && [ERR_NO_PATH, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH].includes(result)) {
             result = creep.build(targets[++currentIndex]);
         }
 
