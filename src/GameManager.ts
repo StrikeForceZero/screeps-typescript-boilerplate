@@ -83,8 +83,9 @@ export default class GameManager {
 
         const outputTable = ['<table>'];
         for (const [role, creeps] of Object.entries(roles)) {
-            outputTable.push(`<tr><td>${role}</td>${creeps.map(creep => `<td>${creep.name}</td>`).join('')}</tr>`);
+            outputTable.push(`<tr><td>${role} (${creeps.length}) : </td>${creeps.map(creep => `<td>${creep.name} </td>`).join('')}</tr>`);
         }
+        outputTable.push(`<tr><td>Total (${Memory.totalCreepsAlive})</td></tr>`);
         outputTable.push('</table>');
 
         console.log(outputTable.join(''));
