@@ -6,7 +6,15 @@ export default function runBuildTask(creep: CreepWrapper) {
         return creep.updateCurrentTaskStatus(RoleTaskStatus.Failed);
     }
 
-    const targets = creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES);
+    const priorityBuildAreas = creep.room.find<Flag>(FIND_FLAGS, {
+        filter: flag => flag.name === 'priority_build',
+    });
+
+    const priorityTargets = priorityBuildAreas
+        .map(flag => flag.pos.findInRange<ConstructionSite>(FIND_CONSTRUCTION_SITES, 6))
+        .filter(x => x.length > 0);
+
+    const targets = priorityTargets.length > 0 ? priorityTargets[0] : creep.room.find<ConstructionSite>(FIND_CONSTRUCTION_SITES);
 
     if (targets.length > 0 && creep.build(targets[0]) === OK) {
         if (creep.isEmpty) {
