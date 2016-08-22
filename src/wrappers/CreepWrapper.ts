@@ -206,7 +206,7 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
     }
 
     get isFull() {
-        return this.creep.carry.energy >= this.creep.carryCapacity;
+        return this.creep.carry.energy >= this.creep.carryCapacity && this.creep.carryCapacity !== 0;
     }
 
     get isEmpty() {
@@ -362,11 +362,11 @@ export default class CreepWrapper extends EntityWithNameAndId<CreepWrapperEntity
                     ? this.updateCurrentTaskStatus(runSourceTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Pickup:
-                return this.hasBodyPart(CARRY)
+                return this.hasBodyPart(CARRY) || this.memory.currentRole === Role.Harvester
                     ? this.updateCurrentTaskStatus(runPickupTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Store:
-                return this.hasBodyPart(CARRY)
+                return this.hasBodyPart(CARRY) || this.memory.currentRole === Role.Harvester
                     ? this.updateCurrentTaskStatus(runStoreTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;
             case RoleTask.Build:
