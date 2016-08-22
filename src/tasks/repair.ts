@@ -42,5 +42,11 @@ export default function runRepairTask(creep: CreepWrapper) {
             return RoleTaskStatus.Ok;
         }
     }
+
+    // Fail role since we are out of work
+    if (targets.length === 0) {
+        creep.failTaskAndRoleStatus();
+    }
+
     return RoleTaskStatus.Failed;
 };

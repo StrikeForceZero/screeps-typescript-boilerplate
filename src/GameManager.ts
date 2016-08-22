@@ -57,9 +57,6 @@ function enqueueWorkers(spawn: Spawn, creeps: CreepWrapper[]) {
     const standardWorkerBody = (BodyPart.WORK | BodyPart.CARRY | BodyPart.MOVE);
     const creepsWithStandardWorkerBodies = creeps.filter(creep => (creep.bodyFlags & standardWorkerBody) === standardWorkerBody);
 
-    console.log(creeps[0].bodyFlags.toString(2));
-    console.log(creepsWithStandardWorkerBodies.length);
-
     if (creepsWithStandardWorkerBodies.length > 4) {
         const carrierWorkerBody = (BodyPart.CARRY | BodyPart.MOVE);
         const creepsWithCarrierBodies = creeps.filter(creep =>
