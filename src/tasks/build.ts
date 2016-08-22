@@ -18,13 +18,13 @@ export default function runBuildTask(creep: CreepWrapper) {
 
     if (targets.length > 0) {
         let currentIndex = 0;
-        let result = creep.build(targets[currentIndex]);
+        let result       = creep.build(targets[currentIndex]);
 
         while (currentIndex < targets.length && [ERR_NO_PATH, ERR_INVALID_TARGET, ERR_RCL_NOT_ENOUGH].includes(result)) {
             result = creep.build(targets[++currentIndex]);
         }
 
-        if(result === OK) {
+        if (result === OK) {
             if (creep.isEmpty) {
                 return RoleTaskStatus.Completed;
             }
