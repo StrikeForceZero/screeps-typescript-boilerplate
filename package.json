@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "description": "WIP boilerplate for screeps with typescript support",
   "scripts": {
-    "build:clean": "rimraf dist",
+    "build:clean": "rimraf dist && rimraf .awcache",
     "prebuild": "npm run build:clean",
-    "build": "webpack --config webpack.config.js --watch",
-    "start": "npm run build",
+    "build:watch": "npm run build -- --watch",
+    "build": "webpack --config webpack.config.js",
+    "start": "npm run build:watch",
     "deploy": "node deploy.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,8 +15,6 @@
   "license": "MIT",
   "devDependencies": {
     "awesome-typescript-loader": "^2.2.1",
-    "babel-core": "^6.13.2",
-    "babel-preset-es2015": "^6.13.2",
     "bluebird": "^3.4.1",
     "chalk": "^1.1.3",
     "expose-loader": "^0.7.1",

@@ -1,34 +1,36 @@
-const webpack = require("webpack");
-const path = require("path");
+const webpack = require('webpack');
+const path = require('path');
 const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const chalk = require('chalk');
 
+const SourceDir = path.resolve(__dirname, './src');
+const DistDir = path.join(__dirname, 'dist');
+
 module.exports = {
+    devtool: 'inline-source-map',
     debug: true,
     target: 'node',
     context: __dirname,
     entry: {
-        main: "./src/main.ts",
+        main: path.join(SourceDir, 'main.ts'),
     },
     output: {
-        path: path.join(__dirname, "dist"),
-        filename: "main.js",
+        path: DistDir,
+        filename: 'main.js',
         pathinfo: true,
-        libraryTarget: "commonjs",
-        // name of the global var: "Foo",
-        library: "loop",
+        libraryTarget: 'commonjs2',
     },
     module: {
         loaders: [
-            { test: /\.ts/,   loader: "awesome-typescript-loader" },
+            { test: /\.ts/,   loader: 'awesome-typescript-loader' },
         ],
         preLoaders: [
             {
                 test: /\.ts/,
-                include: path.join(__dirname, "src"),
-                loader: "tslint",
+                include: SourceDir,
+                loader: 'tslint',
             },
         ]
     },
@@ -36,7 +38,7 @@ module.exports = {
         failOnHint: false,
     },
     resolve: {
-        root: path.join(__dirname, "src"),
+        root: SourceDir,
         extensions: ['', '.ts'],
     },
     plugins: [

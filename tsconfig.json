@@ -1,17 +1,14 @@
 {
   "compilerOptions": {
-    "outFile": "./dist/main.js",
+    "noEmit": true,
     "module": "commonjs",
     "target": "es6",
     "sourceMap": true,
+    "removeComments": false,
     "noImplicitAny": false,
     "preserveConstEnums": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "lib": ["dom","es5","es6","es7","es2017.object"],
-    "allowSyntheticDefaultImports": true,
-    "removeComments": false,
-    "noEmit": true
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "./typings/index.d.ts",
@@ -25,8 +22,8 @@
     "./dist"
   ],
   "awesomeTypescriptLoaderOptions": {
-    "useBabel": true,
+    "useBabel": false,
     "forkChecker": true,
-    "useCache": false
+    "useCache": true
   }
 }

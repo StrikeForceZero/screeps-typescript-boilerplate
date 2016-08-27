@@ -16,3 +16,6 @@ dist
 
 ## config
 config.js
+
+## accidental typescript compilatons
+src/**/*.js

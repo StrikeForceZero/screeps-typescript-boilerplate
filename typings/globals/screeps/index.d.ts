@@ -496,21 +496,21 @@ declare type Tower = StructureTower;
 interface Storage extends StructureStorage {
 }
 
-declare interface CreepDestination {
+declare interface ICreepDestination {
     x: number;
     y: number;
     room: string;
 }
 
-declare interface CreepMove {
-    dest: CreepDestination;
+declare interface ICreepMove {
+    dest: ICreepDestination;
     time: number;
     path: string;
     room: string;
 }
 
-declare interface CreepMemory {
-    _move: CreepMove;
+declare interface ICreepMemory {
+    _move: ICreepMove;
 }
 
 /**
@@ -554,7 +554,7 @@ declare class Creep extends RoomObject {
     /**
      * A shorthand to Memory.creeps[creep.name]. You can use it for quick access the creep’s specific memory data object.
      */
-    memory:  CreepMemory;
+    memory:  ICreepMemory;
     /**
      * Whether it is your creep or foe.
      */
@@ -696,7 +696,7 @@ declare class Creep extends RoomObject {
     /**
      * Display a visual speech balloon above the creep with the specified message. The message will disappear after a few seconds. Useful for debugging purposes. Only the creep's owner can see the speech message.
      * @param message The message to be displayed. Maximum length is 10 characters.
-     * @param set to 'true' to allow other players to see this message. Default is 'false'.
+     * @param toPublic set to 'true' to allow other players to see this message. Default is 'false'.
      */
     say(message: string, toPublic?: boolean): number;
     /**
@@ -751,7 +751,7 @@ declare class Flag extends RoomObject {
     /**
      * Set new color of the flag.
      * @param color One of the following constants: COLOR_WHITE, COLOR_GREY, COLOR_RED, COLOR_PURPLE, COLOR_BLUE, COLOR_CYAN, COLOR_GREEN, COLOR_YELLOW, COLOR_ORANGE, COLOR_BROWN
-     * @parma secondaryColor Secondary color of the flag. One of the COLOR_* constants.
+     * @param secondaryColor Secondary color of the flag. One of the COLOR_* constants.
      * @returns Result Code: OK, ERR_INVALID_ARGS
      */
     setColor(color: number, secondaryColor?: number): number;
@@ -1041,6 +1041,7 @@ declare class GameMap {
      * Find route from the given room to another room.
      * @param fromRoom Start room name or room object.
      * @param toRoom Finish room name or room object.
+     * @param opts
      * @returns the route array or ERR_NO_PATH code
      */
     findRoute(fromRoom: string | Room, toRoom: string | Room, opts?: {
@@ -1625,6 +1626,7 @@ declare class Room {
      * @param left The left X boundary of the area.
      * @param bottom The bottom Y boundary of the area.
      * @param right The right X boundary of the area.
+     * @param asArray
      * @returns An object with all the objects in the specified area
      */
     lookAtArea(top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];
@@ -1652,6 +1654,7 @@ declare class Room {
      * @param left The left X boundary of the area.
      * @param bottom The bottom Y boundary of the area.
      * @param right The right X boundary of the area.
+     * @param asArray
      * @returns An object with all the objects of the given type in the specified area
      */
     lookForAtArea(type: string, top: number, left: number, bottom: number, right: number, asArray?: boolean): LookAtResultMatrix | LookAtResultWithPos[];

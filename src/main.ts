@@ -1,6 +1,4 @@
+import './polyfills';
 import GameManager from './GameManager';
-import 'polyfills';
 
-// console.log('start');
-
-module.exports = () => GameManager.loop();
+export const loop = () => GameManager.loop();
