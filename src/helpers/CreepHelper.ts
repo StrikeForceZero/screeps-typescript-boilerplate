@@ -1,3 +1,5 @@
+import { BodyConfig } from '../wrappers/CreepWrapper';
+import { BODY_COST } from '../types/constants';
 export default class CreepHelper {
     public static hasBodyPart(creep: Creep, partName: string) {
         return CreepHelper.hasBodyParts(creep, [partName]);
@@ -13,5 +15,9 @@ export default class CreepHelper {
 
     public static isFull(creep: Creep) {
         return creep.carry.energy + creep.carry.power >= creep.carryCapacity;
+    }
+
+    public static getBodyCost(body: BodyConfig) {
+        return body.reduce((p, c) => p + BODY_COST[c], 0);
     }
 }

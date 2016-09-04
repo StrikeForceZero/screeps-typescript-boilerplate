@@ -4,6 +4,7 @@ import {Role} from '../wrappers/CreepWrapper';
 
 export default function runPickupTask(creep: CreepWrapper) {
     if (creep.isFull) {
+        console.log('full');
         return RoleTaskStatus.Completed;
     }
 
@@ -17,12 +18,15 @@ export default function runPickupTask(creep: CreepWrapper) {
     const targets = droppedResources.length > 0 ? droppedResources : carriersWithEnergy;
 
     if (targets.length > 0 && creep.pickup(targets[0]) === OK) {
+        console.log('pickup complete');
         if (creep.isFull) {
+            console.log('full');
             return RoleTaskStatus.Completed;
         }
         return RoleTaskStatus.Ok;
     }
     if (!creep.isEmpty) {
+        console.log('not empty');
         return RoleTaskStatus.Completed;
     }
     return RoleTaskStatus.Failed;

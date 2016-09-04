@@ -1,16 +1,16 @@
 /* tslint:disable:interface-name */
 
-const reduce = Function.bind.call(Function.call, Array.prototype.reduce);
+const reduce       = Function.bind.call(Function.call, Array.prototype.reduce);
 const isEnumerable = Function.bind.call(Function.call, Object.prototype.propertyIsEnumerable);
-const concat = Function.bind.call(Function.call, Array.prototype.concat);
-const keys = (o) => Object.keys(o);
+const concat       = Function.bind.call(Function.call, Array.prototype.concat);
+const keys         = (o) => Object.keys(o);
 
 interface ObjectConstructor {
     keys(o: any): string[];
     values<T>(o: { [s: string]: T }): T[];
     values(o: any): any[];
     entries<T>(o: { [s: string]: T }): [string, T][];
-    entries<K, T>(o: { [s: string | number]: T }): [K, T][];
+    entries<K, T>(o: { [s: string]: T }): [K, T][];
     entries(o: any): [string, any][];
 }
 
@@ -33,13 +33,13 @@ interface Array<T> {
 }
 
 if (!Array.prototype.includes) {
-    Array.prototype.includes = function(searchElement /*, fromIndex*/) {
+    Array.prototype.includes = function (searchElement /*, fromIndex*/) {
         'use strict';
         if (this == null) {
             throw new TypeError('Array.prototype.includes called on null or undefined');
         }
 
-        const O = Object(this);
+        const O   = Object(this);
         const len = parseInt(O.length, 10) || 0;
         if (len === 0) {
             return false;
@@ -50,7 +50,7 @@ if (!Array.prototype.includes) {
             k = n;
         } else {
             k = len + n;
-            if (k < 0) {k = 0;}
+            if (k < 0) { k = 0; }
         }
         let currentElement;
         while (k < len) {

@@ -154,6 +154,10 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
     private static wrap(creep: Creep): CreepWrapperEntityType {
         const wrappedCreep = creep as CreepWrapperEntityType & CreepWrapper;
 
+        if (typeof wrappedCreep.memory === 'undefined') {
+            throw new Error('creep has no memory');
+        }
+
         if (wrappedCreep.memory.lastTick === Game.time) {
             return wrappedCreep;
         }
@@ -171,6 +175,8 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
             return wrappedCreep;
         }
 
+        wrappedCreep.memory.isWrapped = true;
+
         wrappedCreep.memory.originalBodyConfig = wrappedCreep.body.map(bpd => BodyPart[bpd.type.toUpperCase()]).reduce((p, c) => {
             p |= c;
             return p;
@@ -184,7 +190,7 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
     }
 
     get name(): string {
-        return this.target.id;
+        return this.target.name;
     }
 
     get creep() {
@@ -221,15 +227,17 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
         return this.body.some(bpd => bpd.type.toUpperCase() === (bodyPart as string).toUpperCase());
     }
 
-    public isEmpty(creep: Creep) {
-        return creep.carry.energy === 0 && creep.carry.power === 0 && creep.carryCapacity > 0;
+    get isEmpty() {
+        return this.creep.carry.energy === 0 && this.creep.carryCapacity > 0; // this.creep.carry.power === 0
     }
 
-    public isFull(creep: Creep) {
-        return creep.carry.energy + creep.carry.power >= creep.carryCapacity;
+    get isFull() {
+        console.log(`${this.creep.carry.energy} / ${this.creep.carryCapacity}`);
+        return this.creep.carry.energy >= this.creep.carryCapacity; // + this.creep.carry.power
     }
 
     public static assignRole(creep: CreepWrapperEntityType, role: Role = Role.None, isDefault: boolean = false, isRoleLocked: boolean = false) {
+        console.log('new role assigned');
         creep.memory.defaultRole           = isDefault ? role : creep.memory.defaultRole || role;
         creep.memory.currentRole           = role;
         creep.memory.currentRoleStatus     = RoleTaskStatus.Ok;
@@ -249,7 +257,7 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
         const nextRoleTaskIndex           = currentRoleTaskIndex >= currentRoleTasks.length - 1 ? 0 : currentRoleTaskIndex + 1;
         this.memory.currentRoleTask       = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
         this.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
-        // console.log(`[TASK (Next)] ${this.name} : ${currentRoleTaskIndex} -> ${nextRoleTaskIndex}`);
+        console.log(`[TASK (Next)] ${this.name} : ${RoleTask[currentRoleTasks[currentRoleTaskIndex]]} -> ${RoleTask[currentRoleTasks[nextRoleTaskIndex]]}`);
         // console.log(`${this.name} role: ${Role[this.memory.currentRole]} next: ${RoleTask[RoleTaskPriorty[this.memory.currentRole].indexOf(this.memory.currentRoleTask)]}`);
         return this;
     }
@@ -260,7 +268,7 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
         const nextRoleTaskIndex           = currentRoleTaskIndex > 0 ? currentRoleTaskIndex - 1 : 0;
         this.memory.currentRoleTask       = currentRoleTasks[nextRoleTaskIndex] || currentRoleTasks[0];
         this.memory.currentRoleTaskStatus = RoleTaskStatus.Ok;
-        // console.log(`[TASK (Prev)] ${this.name} : ${currentRoleTaskIndex} -> ${nextRoleTaskIndex}`);
+        console.log(`[TASK (Prev)] ${this.name} : ${RoleTask[currentRoleTasks[currentRoleTaskIndex]]} -> ${RoleTask[currentRoleTasks[nextRoleTaskIndex]]}`);
         // console.log(`${this.name} role: ${Role[this.memory.currentRole]} previous: ${RoleTask[currentRoleTasks[nextRoleTaskIndex]]}`);
         return this;
     }
@@ -369,12 +377,14 @@ export default class CreepWrapper extends AbstractRoomObjectWrapper<CreepWrapper
     }
 
     public failTaskAndRoleStatus() {
-        return this.updateCurrentTaskStatus(RoleTaskStatus.Failed);//.updateCurrentRoleStatus(RoleTaskStatus.Failed);
+        return this.updateCurrentTaskStatus(RoleTaskStatus.Failed); // .updateCurrentRoleStatus(RoleTaskStatus.Failed);
     }
 
     private performTask() {
+        console.log(`starting task ${RoleTask[this.memory.currentRoleTask]}`);
         switch (this.memory.currentRoleTask) {
             case RoleTask.Source:
+                console.log(RoleTaskStatus[this.memory.currentRoleTaskStatus]);
                 return this.hasBodyPart(WORK)
                     ? this.updateCurrentTaskStatus(runSourceTask(this)).memory.currentRoleTaskStatus
                     : this.failTaskAndRoleStatus().memory.currentRoleTaskStatus;

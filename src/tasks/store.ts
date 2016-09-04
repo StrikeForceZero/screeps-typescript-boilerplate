@@ -3,6 +3,7 @@ import {RoleTaskStatus} from '../wrappers/CreepWrapper';
 
 export default function runStoreTask(creep: CreepWrapper) {
     if (creep.isEmpty) {
+        console.log('empty');
         return RoleTaskStatus.Failed;
     }
 
@@ -16,6 +17,7 @@ export default function runStoreTask(creep: CreepWrapper) {
     });
 
     if (targets.length === 0) {
+        console.log('no main structures');
         targets = creep.room.find<Structure>(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (structure.structureType === STRUCTURE_CONTAINER) && structure.store[RESOURCE_ENERGY] < structure.storeCapacity;
@@ -25,6 +27,7 @@ export default function runStoreTask(creep: CreepWrapper) {
 
     if (targets.length > 0 && creep.store(targets[0]) === OK) {
         if (creep.isEmpty) {
+            console.log('empty');
             return RoleTaskStatus.Completed;
         }
         return RoleTaskStatus.Ok;
@@ -32,6 +35,7 @@ export default function runStoreTask(creep: CreepWrapper) {
 
     // Fail role since we are out of work
     if (targets.length === 0) {
+        console.log('no targets');
         creep.failTaskAndRoleStatus();
     }
 

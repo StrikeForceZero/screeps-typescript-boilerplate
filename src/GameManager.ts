@@ -43,7 +43,7 @@ export default class GameManager {
 
         const rooms = Object.values<Room>(Game.rooms);
         for (const room of GameManager.wrapAll(rooms, RoomWrapper)) {
-            console.log(room.name);
+            console.log('room: ' + room.name);
 
             memory.totalCreepsAlive += room.creeps.length;
 

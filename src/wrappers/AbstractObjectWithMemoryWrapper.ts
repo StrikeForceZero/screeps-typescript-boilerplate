@@ -17,6 +17,7 @@ export default class AbstractObjectWithMemoryWrapper<T> extends AbstractEntityWr
         if (!AbstractObjectWithMemoryWrapper.hasMemory(target)) {
             throw new Error('object does not contain memory');
         }
+        this.memory.isWrapped = true;
         this.target = target as T & IWrapped;
     }
 
